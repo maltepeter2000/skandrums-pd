@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Generate tests/pd/test_events.pd: choke wiring, dump/store/recall, errors."""
+"""Generate tests/pd/test_events.pd: choke wiring, dump/restore, errors."""
 objs, conns = [], []
 def add(s): objs.append(s); return len(objs) - 1
 def conn(a, ao, b, bi): conns.append(f"#X connect {a} {ao} {b} {bi};")
@@ -22,7 +22,7 @@ sched = [
  (50,   "; oh bang"),
  (400,  "; ch bang"),
  (900,  "; oh bang"),
- (1000, "; oh dump; oh get dec; oh store 2; oh dec 10; oh dump; oh recall 2; oh dump; ch dump; oh dump 2; oh dump 7"),
+ (1000, "; oh dump; oh get dec; oh dec 10; oh dump; oh dump trxoh 1 2 3 4 5; oh dump; ch dump"),
  (1100, "; oh dump trxch 1 2 3 4 5; oh dump trxoh 7 8 9 10 11; oh dump; oh foo; oh dec abc; oh ctl 9 1"),
  (1200, "; oh print; oh 200; oh choke; oh chokems 20; oh bang; oh level 0.5"),
  (2500, "; cmd stop"),

@@ -73,11 +73,12 @@ out/dump_voices: tools/dump_voices.c src/skcore.c src/skres.c out/voices_gen.h $
 help: out/dump_voices
 	./out/dump_voices > out/voices.txt
 	python3 tools/gen_help.py out/voices.txt help
+	python3 tools/gen_skpreset.py pd/skpreset.pd
 
 install: all
 	mkdir -p "$(INSTALLDIR)"
 	cp out/*.$(EXT) "$(INSTALLDIR)/"
-	-cp help/*.pd "$(INSTALLDIR)/" 2>/dev/null
+	-cp help/*.pd pd/*.pd "$(INSTALLDIR)/" 2>/dev/null
 
 clean:
 	rm -rf out

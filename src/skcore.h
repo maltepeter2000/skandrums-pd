@@ -1,6 +1,6 @@
 /* SPDX-License-Identifier: CC0-1.0
  * skcore: host-independent wrapper around one mdkit voice.
- * Adds host-rate conversion, velocity/level, choke, preset slots, dump and
+ * Adds host-rate conversion, velocity/level, choke, dump and
  * "done" detection. No Pd dependency, so it can be tested in plain C.
  */
 #ifndef SKCORE_H
@@ -8,7 +8,6 @@
 #include "mdkit.h"
 #include "skres.h"
 
-#define SK_SLOTS 16
 #define SK_DONE_DB_LINEAR 1.0e-4f   /* about -80 dB */
 #define SK_DONE_QUIET_MS  50.0
 #define SK_CHOKE_MS_DEFAULT 3.0
@@ -18,8 +17,6 @@ typedef struct skcore {
     void *state;
     unsigned nctl;
     unsigned char ctl[MDKIT_MAX_CONTROLS];
-    unsigned char slot[SK_SLOTS][MDKIT_MAX_CONTROLS];
-    unsigned char slot_used[SK_SLOTS];
     float level, vel;
     float gain, gstep;            /* choke ramp gain (1 = open) */
     double choke_ms;
@@ -41,8 +38,6 @@ void skcore_trigger(skcore *c, int velocity);       /* velocity 1..127, 0 -> 127
 void skcore_choke(skcore *c);
 void skcore_defaults(skcore *c);
 unsigned char skcore_default_of(const mdkit_voice *v, unsigned i);
-int  skcore_store(skcore *c, unsigned slot);        /* 0 ok */
-int  skcore_recall(skcore *c, unsigned slot);       /* 0 ok, -1 empty/invalid */
 void skcore_process(skcore *c, float *out, int frames);
 int  skcore_take_done(skcore *c);                   /* 1 once after voice died */
 

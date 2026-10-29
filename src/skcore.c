@@ -122,22 +122,6 @@ void skcore_choke(skcore *c)
     c->gstep = (float)(1.0 / n);
 }
 
-int skcore_store(skcore *c, unsigned slot)
-{
-    if (slot >= SK_SLOTS) return -1;
-    memcpy(c->slot[slot], c->ctl, sizeof c->ctl);
-    c->slot_used[slot] = 1;
-    return 0;
-}
-
-int skcore_recall(skcore *c, unsigned slot)
-{
-    if (slot >= SK_SLOTS || !c->slot_used[slot]) return -1;
-    memcpy(c->ctl, c->slot[slot], sizeof c->ctl);
-    apply_all(c);
-    return 0;
-}
-
 static void render_cb(void *ctx, float *dst, int frames)
 {
     skcore *c = (skcore *)ctx;

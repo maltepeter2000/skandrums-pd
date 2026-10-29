@@ -106,7 +106,7 @@ int main(void)
           }
           skcore_free(&c); }
 
-        /* 6. controls, names, presets */
+        /* 6. controls, names */
         skcore_init(&c, v, 44100.0);
         for (i = 0; i < (int)c.nctl; ++i) {
             CHECK(skcore_find_control(&c, v->control_names[i]) == i, "find_control %s", v->control_names[i]);
@@ -115,10 +115,6 @@ int main(void)
         CHECK(skcore_find_control(&c, "nope") == -1, "find_control accepts garbage");
         skcore_set_control(&c, 0, 300); CHECK(c.ctl[0] == 127, "clamp high");
         skcore_set_control(&c, 0, -5);  CHECK(c.ctl[0] == 0, "clamp low");
-        skcore_set_control(&c, 0, 33);  skcore_store(&c, 3);
-        skcore_set_control(&c, 0, 99);  CHECK(skcore_recall(&c, 3) == 0 && c.ctl[0] == 33, "recall");
-        CHECK(skcore_recall(&c, 4) == -1, "empty slot recall");
-        CHECK(skcore_recall(&c, 99) == -1, "bad slot recall");
         skcore_defaults(&c); CHECK(c.ctl[0] == skcore_default_of(v, 0), "defaults");
         skcore_free(&c);
 

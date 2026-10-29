@@ -6,7 +6,7 @@ Alle Objekte entstehen aus demselben Quelltext (`src/skdrums_tilde.c`), nur die 
 Lizenz: CC0 1.0, wie mdkit.
 
 **Stand:** Auf Linux gebaut und getestet (siehe unten). macOS und Bela sind noch nicht getestet.
-Help-Patches fehlen noch.
+.
 
 ## Objekte
 
@@ -70,10 +70,7 @@ haben, steht in mdkit nicht beschrieben.
 | `print` | Stimme, Controls und Samplerate in die Pd-Konsole |
 | `choke` | Stimme in `chokems` ausblenden (siehe Choke) |
 | `chokems <ms>` | Länge der Ausblendung, Default 3 ms |
-| `store <0..15>` | aktuelle Controls in Speicherplatz legen |
-| `recall <0..15>` | Speicherplatz laden |
 | `dump` | alle Controls als `dump <name> v0 v1 ...` an Outlet 1 |
-| `dump <0..15>` | Inhalt eines Speicherplatzes ausgeben |
 | `dump <name> v0 v1 ...` | Controls aus einem früheren Dump zurückladen |
 
 ## Choke (z. B. Closed Hat schneidet Open Hat ab)
@@ -86,16 +83,23 @@ die verstummen soll:
 `trxoh~` blendet auf `choke` in `chokems` (3 ms) aus und bleibt still, bis es selbst getriggert wird.
 Jede Stimme kann jede andere choken, auch mehrere. Der Choke wirkt ab dem nächsten Audioblock.
 
-## Presets
+## Presets und Steps: `[skpreset]`
 
-`dump` liefert den aktuellen Zustand als Message, die du in `[text]`, `[coll]` oder einer
-Datei ablegen kannst. Dieselbe Message ruft ihn wieder auf, zum Beispiel für `[trxb2~]`:
+`dump` liefert den aktuellen Zustand als Message, `dump <name> v0 v1 ...` stellt ihn wieder her.
+Der Name nach `dump` ist der Objektname; eine Message mit fremdem Namen wird ignoriert.
 
-    dump trxb2 60 65 41 62 91 44 56 58
+Darauf baut die Abstraktion `pd/skpreset.pd` auf (Hilfe: `skpreset-help.pd`). Sie hält pro Stimme
+16 Slots (z. B. einen pro Step) in einem `[text define -k name]` im Hauptpatch, der mit dem Patch
+gespeichert wird:
 
-Der Name nach `dump` ist der Objektname. Eine Message mit fremdem Namen wird ignoriert, so kann
-Outlet 1 gefahrlos an eine andere Stimme gehen. Zusätzlich gibt es 16 interne Speicherplätze
-(`store`/`recall`), die nicht gespeichert werden und beim Schließen des Patches verloren gehen.
+    [trxb2~] Outlet 1  ->  [skpreset name] Inlet 0
+    [skpreset name] Outlet 0  ->  Inlet [trxb2~]
+    [hradio] (0..15)   ->  [skpreset name] Inlet 1
+
+Beim Slotwechsel werden zuerst die aktuellen Werte in den alten Slot geschrieben, dann wird der neue
+geladen. Ein leerer Slot übernimmt den aktuellen Sound. Outlet 1 von `[skpreset]` liefert die geladenen
+Werte als Liste (für Zahlenboxen). Mehrere Stimmen: je ein Text und ein `[skpreset]`, alle Slot-Inlets
+von einem `[hradio]` aus.
 
 `done` kommt an Outlet 1, wenn die Stimme länger als 50 ms unter etwa −80 dB bleibt.
 
