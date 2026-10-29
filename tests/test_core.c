@@ -43,13 +43,13 @@ int main(void)
         skcore c;
         void *st;
 
-        /* 1. direct path is bit-exact with the raw voice */
+        /* 1. direct path is bit-exact with the raw voice (until the voice is declared done, then silence) */
         a = render(v, 44100.0, N, 64, -1, 0, 0, -1, 127);
         st = calloc(1, v->state_bytes);
         v->init(st); v->trigger(st);
         raw = calloc(N, sizeof(float));
         for (i = 0; i < N; i += 100) v->render(st, raw + i, (unsigned)(N - i < 100 ? N - i : 100));
-        for (i = 0; i < N; ++i) { if (a[i] != raw[i]) ++nd; if (!(fabsf(a[i]) <= 4.f)) nd += 1000000; if (fabsf(a[i]) > peak) peak = fabsf(a[i]); }
+        for (i = 0; i < N; ++i) { if (a[i] != raw[i] && !(a[i] == 0.f && fabsf(raw[i]) < 2e-4f)) ++nd; if (!(fabsf(a[i]) <= 4.f)) nd += 1000000; if (fabsf(a[i]) > peak) peak = fabsf(a[i]); }
         CHECK(nd == 0, "44.1k direct path differs from raw voice in %d samples", nd);
         CHECK(peak > 1e-3f, "silent (peak %g)", peak);
         free(st); free(raw);

@@ -110,6 +110,7 @@ void skcore_trigger(skcore *c, int velocity)
     if (velocity <= 0 || velocity > 127) velocity = 127;
     c->vel = (float)velocity / 127.f;
     c->gain = 1.f; c->gstep = 0.f;
+    if (!c->active) skres_reset(&c->rs);   /* an idle voice is not rendered, drop stale history */
     c->v->trigger(c->state);
     c->active = 1; c->quiet = 0; c->idle = 0; c->armed = 0; c->done_pending = 0;
 }
@@ -131,6 +132,10 @@ static void render_cb(void *ctx, float *dst, int frames)
 void skcore_process(skcore *c, float *out, int frames)
 {
     int i;
+    if (!c->active) {                      /* idle voices cost nothing */
+        for (i = 0; i < frames; ++i) out[i] = 0.f;
+        return;
+    }
     skres_process(&c->rs, out, frames, render_cb, c);
     for (i = 0; i < frames; ++i) {
         float raw = out[i];
@@ -147,6 +152,11 @@ void skcore_process(skcore *c, float *out, int frames)
             } else if (!c->armed && ++c->idle >= c->idle_max) {
                 c->active = 0;      /* never became audible: give up silently */
             }
+        }
+        if (!c->active) {                  /* went idle: silence the rest, block-size independent */
+            int k;
+            for (k = i + 1; k < frames; ++k) out[k] = 0.f;
+            break;
         }
     }
 }
