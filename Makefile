@@ -90,4 +90,17 @@ install: all
 clean:
 	rm -rf out
 
-.PHONY: all test help bench install clean
+.PHONY: all test help bench install clean bela test-slots ptch
+
+# Bela slot instrument (8 slots, MIDI, buttons, pots) -> bela/*.pd
+bela:
+	python3 tools/gen_bela.py
+
+test-slots: all bela
+	python3 tools/test_slots.py
+
+# re-measure PTCH -> note tables (writes data/ptch, src/skptch.h)
+ptch:
+	mkdir -p out/ptch out/ptchv
+	cc -std=gnu99 -O2 -Isrc -Imdkit/include -Iout $(addprefix -I,$(wildcard mdkit/src/*/*)) tools/ptch_dump.c src/skcore.c src/skres.c $(VOICE_SRC) -lm -o out/ptch_dump
+	./out/ptch_dump && python3 tools/ptch_analyze.py && python3 tools/ptch_tables.py && python3 tools/gen_ptch_h.py

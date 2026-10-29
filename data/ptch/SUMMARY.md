@@ -15,10 +15,10 @@ Dominant partial 30-250 ms after trigger, controls at defaults, 44.1 kHz. Note n
 | PI-BD | clean | 22.4 - 44.9 | 0 - 124 |
 | PI-CC | unpitched / unstable (noise or partial switching) | - | - |
 | PI-HH | unpitched / unstable (noise or partial switching) | - | - |
-| PI-ML | partly pitched (jumps outside range) | 66.1 - 76.4 | 0 - 56 |
-| PI-MT | partly pitched (jumps outside range) | 38.0 - 65.2 | 0 - 84 |
+| PI-ML | partly pitched (jumps outside range) | 66.0 - 74.0 | 0 - 56 |
+| PI-MT | partly pitched (jumps outside range) | 52.0 - 64.0 | 0 - 84 |
 | PI-RC | unpitched / unstable (noise or partial switching) | - | - |
-| PI-RS | partly pitched (jumps outside range) | 49.5 - 72.4 | 20 - 72 |
+| PI-RS | excluded: pitch jumps between partials | - | - |
 | PI-SD | unpitched / unstable (noise or partial switching) | - | - |
 | TRX-B2 | partly pitched (jumps outside range) | 12.3 - 44.1 | 8 - 124 |
 | TRX-BD | clean | 23.2 - 45.5 | 0 - 124 |

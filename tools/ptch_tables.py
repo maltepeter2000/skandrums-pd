@@ -4,9 +4,14 @@ Writes data/ptch/<VOICE>.txt ("<midi note> <ptch>;" per line, Pd text format) an
 import json, numpy as np, os
 r=json.load(open('out/ptch/analysis.json')); os.makedirs('data/ptch',exist_ok=True)
 def note(f): return 69+12*np.log2(f/440)
-CLEAN_MIN_ST=2.0   # at least this many semitones of usable range
+CLEAN_MIN_ST=2.0
+# end-to-end verification (tools/ptch_verify.py) showed partial switching outside these ranges
+RANGE={'PI-MT':(52,64),'PI-ML':(66,74)}
+EXCLUDE={'PI-RS'}   # at least this many semitones of usable range
 rows=[]
 for n,d in sorted(r.items()):
+    if n in EXCLUDE:
+        rows.append((n,'excluded: pitch jumps between partials',None,None,None)); continue
     pts=[(v,note(f)) for v,f in d['table'] if f and f>14]
     # longest strictly rising run (allow 0.3 st wobble)
     best=[];cur=[]
@@ -31,9 +36,10 @@ for n,d in sorted(r.items()):
         if m<=lo: p=v[0] if m>=lo-0.5 else None
         elif m>=hi: p=v[-1] if m<=hi+0.5 else None
         else: p=np.interp(m,s,v)
+        if n in RANGE and not (RANGE[n][0]<=m<=RANGE[n][1]): continue
         if p is not None: lines.append(f"{m} {int(round(p))};")
     open(f"data/ptch/{n}.txt",'w').write("\n".join(lines)+"\n")
-    rows.append((n,kind,(lo,hi),(v[0],v[-1]),len(lines)))
+    rows.append((n,kind,RANGE.get(n,(lo,hi)),(v[0],v[-1]),len(lines)))
 md=["# PTCH measurements","","Dominant partial 30-250 ms after trigger, controls at defaults, 44.1 kHz. Note numbers are MIDI (A4=69=440 Hz).","",
 "| Voice | Result | Note range | PTCH range |","|---|---|---|---|"]
 for n,k,nr,pr,c in rows:
