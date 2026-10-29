@@ -110,7 +110,7 @@ int main(void)
         skcore_init(&c, v, 44100.0);
         for (i = 0; i < (int)c.nctl; ++i) {
             CHECK(skcore_find_control(&c, v->control_names[i]) == i, "find_control %s", v->control_names[i]);
-            CHECK(c.ctl[i] == (v->control_defaults ? v->control_defaults[i] : 64), "default %d", i);
+            CHECK(c.ctl[i] == skcore_default_of(v, i), "default %d", i);
         }
         CHECK(skcore_find_control(&c, "nope") == -1, "find_control accepts garbage");
         skcore_set_control(&c, 0, 300); CHECK(c.ctl[0] == 127, "clamp high");
@@ -119,7 +119,7 @@ int main(void)
         skcore_set_control(&c, 0, 99);  CHECK(skcore_recall(&c, 3) == 0 && c.ctl[0] == 33, "recall");
         CHECK(skcore_recall(&c, 4) == -1, "empty slot recall");
         CHECK(skcore_recall(&c, 99) == -1, "bad slot recall");
-        skcore_defaults(&c); CHECK(c.ctl[0] == (v->control_defaults ? v->control_defaults[0] : 64), "defaults");
+        skcore_defaults(&c); CHECK(c.ctl[0] == skcore_default_of(v, 0), "defaults");
         skcore_free(&c);
 
         /* 7. done detection (information only) */

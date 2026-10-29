@@ -65,9 +65,9 @@ out/test_core: tests/test_core.c src/skcore.c src/skres.c $(HDRS) out/voices_gen
 test: out/test_core
 	./out/test_core
 
-out/dump_voices: tools/dump_voices.c out/voices_gen.h $(VOICE_SRC)
+out/dump_voices: tools/dump_voices.c src/skcore.c src/skres.c out/voices_gen.h $(VOICE_SRC)
 	$(CC) -std=gnu99 -O2 -Wno-misleading-indentation -Isrc -Imdkit/include -Iout $(VOICE_INC) \
-	  tools/dump_voices.c $(VOICE_SRC) -lm -o $@
+	  tools/dump_voices.c src/skcore.c src/skres.c $(VOICE_SRC) -lm -o $@
 
 # generate help patches (needs python3)
 help: out/dump_voices

@@ -73,6 +73,14 @@ static void emit_values(t_sk *x, const char *sel, const unsigned char *v)
     outlet_anything(x->o_ev, gensym(sel), (int)x->c.nctl + 1, a);
 }
 
+static void emit_params(t_sk *x)
+{
+    t_atom a[MDKIT_MAX_CONTROLS];
+    unsigned i;
+    for (i = 0; i < x->c.nctl; ++i) SETFLOAT(a + i, x->c.ctl[i]);
+    outlet_anything(x->o_ev, gensym("params"), (int)x->c.nctl, a);
+}
+
 static void do_trigger(t_sk *x, int vel)
 {
     if (!x->ok) return;
@@ -151,8 +159,11 @@ static void sk_anything(t_sk *x, t_symbol *s, int argc, t_atom *argv)
         if (k >= 0) skcore_store(&x->c, (unsigned)k);
     } else if (!strcmp(m, "recall")) {
         int k = slot_arg(x, argc, argv, "recall");
-        if (k >= 0 && skcore_recall(&x->c, (unsigned)k))
-            pd_error(x, SK_OBJ_NAME ": slot %d is empty", k);
+        if (k >= 0) {
+            if (skcore_recall(&x->c, (unsigned)k))
+                pd_error(x, SK_OBJ_NAME ": slot %d is empty", k);
+            else emit_params(x);   /* let GUIs follow */
+        }
     } else if (!strcmp(m, "get")) {
         if (argc >= 1 && argv[0].a_type == A_SYMBOL) {
             const char *nm = atom_getsymbol(argv)->s_name;
@@ -167,6 +178,7 @@ static void sk_anything(t_sk *x, t_symbol *s, int argc, t_atom *argv)
         }
     } else if (!strcmp(m, "defaults")) {
         skcore_defaults(&x->c);
+        emit_params(x);
     } else if (!strcmp(m, "level")) {
         t_float f = argc >= 1 ? atom_getfloat(argv) : 1;
         x->c.level = f < 0 ? 0 : (f > 8 ? 8 : f);

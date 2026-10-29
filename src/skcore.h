@@ -40,6 +40,7 @@ int  skcore_find_control(const skcore *c, const char *name); /* case-insens., -1
 void skcore_trigger(skcore *c, int velocity);       /* velocity 1..127, 0 -> 127 */
 void skcore_choke(skcore *c);
 void skcore_defaults(skcore *c);
+unsigned char skcore_default_of(const mdkit_voice *v, unsigned i);
 int  skcore_store(skcore *c, unsigned slot);        /* 0 ok */
 int  skcore_recall(skcore *c, unsigned slot);       /* 0 ok, -1 empty/invalid */
 void skcore_process(skcore *c, float *out, int frames);

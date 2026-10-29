@@ -35,7 +35,9 @@
 #X msg 396 306 clos \$1;
 #X obj 60 444 *~ 0.3;
 #X obj 60 480 dac~;
-#X obj 170 444 print PIHH;
+#X obj 390 444 print PIHH;
+#X obj 170 444 route params;
+#X obj 170 474 unpack f f f f f f f f;
 #X obj 60 534 cnv 10 10 10 empty empty Inlets 24 6 0 14 #1e3791 #000000 0;
 #X text 82 558 0: messages (see Messages below), f 64;
 #X obj 60 602 cnv 10 10 10 empty empty Outlets 24 6 0 14 #1e3791 #000000 0;
@@ -90,6 +92,16 @@
 #X connect 31 0 25 0;
 #X connect 32 0 33 0;
 #X connect 33 0 25 0;
+#X connect 37 0 38 0;
+#X connect 38 0 17 0;
+#X connect 38 1 19 0;
+#X connect 38 2 21 0;
+#X connect 38 3 23 0;
+#X connect 38 4 26 0;
+#X connect 38 5 28 0;
+#X connect 38 6 30 0;
+#X connect 38 7 32 0;
+#X connect 5 1 37 0;
 #X connect 5 0 34 0;
 #X connect 34 0 35 0;
 #X connect 34 0 35 1;

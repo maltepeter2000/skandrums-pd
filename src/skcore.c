@@ -5,9 +5,23 @@
 #include <string.h>
 #include "skcore.h"
 
+/* wrapper-level default overrides (take precedence over mdkit's table) */
+static const struct { const char *name; unsigned char d[MDKIT_MAX_CONTROLS]; } overrides[] = {
+    { "TRX-B2", { 60, 65, 41, 62, 91, 44, 26, 16 } },
+};
+
+unsigned char skcore_default_of(const mdkit_voice *v, unsigned i)
+{
+    unsigned k;
+    for (k = 0; k < sizeof overrides / sizeof overrides[0]; ++k)
+        if (!strcmp(v->name, overrides[k].name) && i < MDKIT_MAX_CONTROLS)
+            return overrides[k].d[i];
+    return v->control_defaults ? v->control_defaults[i] : 64;
+}
+
 static unsigned char default_of(const skcore *c, unsigned i)
 {
-    return c->v->control_defaults ? c->v->control_defaults[i] : 64;
+    return skcore_default_of(c->v, i);
 }
 
 static void apply_all(skcore *c)

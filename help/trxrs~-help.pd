@@ -24,7 +24,9 @@
 #X msg 284 216 dist \$1;
 #X obj 60 354 *~ 0.3;
 #X obj 60 390 dac~;
-#X obj 170 354 print TRXRS;
+#X obj 390 354 print TRXRS;
+#X obj 170 354 route params;
+#X obj 170 384 unpack f f f;
 #X obj 60 444 cnv 10 10 10 empty empty Inlets 24 6 0 14 #1e3791 #000000 0;
 #X text 82 468 0: messages (see Messages below), f 64;
 #X obj 60 512 cnv 10 10 10 empty empty Outlets 24 6 0 14 #1e3791 #000000 0;
@@ -67,6 +69,11 @@
 #X connect 20 0 16 0;
 #X connect 21 0 22 0;
 #X connect 22 0 16 0;
+#X connect 26 0 27 0;
+#X connect 27 0 17 0;
+#X connect 27 1 19 0;
+#X connect 27 2 21 0;
+#X connect 5 1 26 0;
 #X connect 5 0 23 0;
 #X connect 23 0 24 0;
 #X connect 23 0 24 1;

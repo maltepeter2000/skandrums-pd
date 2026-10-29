@@ -158,6 +158,7 @@ def build(name, fam, code, ctls):
         p.conn(m, 0, snd0, 0)
         x += 7 * len(text) + 4 + 16
     snds = {}
+    atoms = []
     for i, (cname, _) in enumerate(ctls):
         r, c = divmod(i, 4)
         cx = CX + c * 112
@@ -165,12 +166,20 @@ def build(name, fam, code, ctls):
         if r not in snds:
             snds[r] = p.add(f"#X obj {CX} {ay + 58} s {bus};")
         a = p.add(f"#X floatatom {cx} {ay} 4 0 127 0 - - - 0;")
+        atoms.append(a)
         m = p.add(f"#X msg {cx} {ay + 30} {cname.lower()} {DOLLAR}1;")
         p.conn(a, 0, m, 0)
         p.conn(m, 0, snds[r], 0)
     mul = p.add(f"#X obj {CX} {mul_y} *~ 0.3;")
     dac = p.add(f"#X obj {CX} {dac_y} dac~;")
-    pr = p.add(f"#X obj {CX + 110} {mul_y} print {short.upper()};")
+    pr = p.add(f"#X obj {CX + 330} {mul_y} print {short.upper()};")
+    rt = p.add(f"#X obj {CX + 110} {mul_y} route params;")
+    n = len(ctls)
+    up = p.add(f"#X obj {CX + 110} {mul_y + 30} unpack {' '.join(['f'] * n)};")
+    p.conn(rt, 0, up, 0)
+    for i, a in enumerate(atoms):
+        p.conn(up, i, a, 0)
+    p.conn(o, 1, rt, 0)
     p.conn(o, 0, mul, 0)
     p.conn(mul, 0, dac, 0)
     p.conn(mul, 0, dac, 1)
