@@ -69,6 +69,13 @@ out/dump_voices: tools/dump_voices.c src/skcore.c src/skres.c out/voices_gen.h $
 	$(CC) -std=gnu99 -O2 -Wno-misleading-indentation -Isrc -Imdkit/include -Iout $(VOICE_INC) \
 	  tools/dump_voices.c src/skcore.c src/skres.c $(VOICE_SRC) -lm -o $@
 
+out/bench: tools/bench.c src/skcore.c src/skres.c $(HDRS) out/voices_gen.h $(VOICE_SRC)
+	$(CC) $(CFLAGS) -Wno-unused-parameter -Iout $(VOICE_INC) \
+	  tools/bench.c src/skcore.c src/skres.c $(VOICE_SRC) -lm -lrt -o $@
+
+bench: out/bench
+	./out/bench $(BS)
+
 # generate help patches (needs python3)
 help: out/dump_voices
 	./out/dump_voices > out/voices.txt
@@ -83,4 +90,4 @@ install: all
 clean:
 	rm -rf out
 
-.PHONY: all test help install clean
+.PHONY: all test help bench install clean
