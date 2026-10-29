@@ -9,6 +9,8 @@ Layout grid: M = 20 px margin. See the constants below.
 import math
 import os
 import sys
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+import manual_text
 
 BS = chr(92)
 SEMI, COMMA, DOLLAR, SPACE = BS + ";", BS + ",", BS + "$", BS + " "
@@ -35,7 +37,7 @@ ROLES = {
             "ma": "Maracas"},
     "efm": {"bd": "Bass Drum", "sd": "Snare", "xt": "Extra Tom", "cp": "Clap",
             "rs": "Rimshot", "cb": "Cowbell", "hh": "Hi-Hat", "cy": "Cymbal"},
-    "pi": {"bd": "Bass Drum", "sd": "Snare", "mt": "Mid Tom", "ml": "Metal",
+    "pi": {"bd": "Bass Drum", "sd": "Snare", "mt": "Tom", "ml": "Metallica",
            "ma": "Maracas", "rs": "Rimshot", "hh": "Hi-Hat", "rc": "Ride",
            "cc": "Crash"},
 }
@@ -69,13 +71,21 @@ class Patch:
         return self.cnv(x, y, 10, 10, label(text), LBL, 6, fs, BLUE, 10)
 
     def comment(self, x, y, lines, width=MAXCH + 2):
+        """One text; every line break is a semicolon (Pd shows it at line end)."""
         for ln in lines:
             assert len(ln) <= MAXCH, f"line too long ({len(ln)}): {ln}"
-        first = None
-        for i, l in enumerate(lines):
-            n = self.add(f"#X text {x} {y + LINE * i} {esc(l)}, f {width};")
-            first = n if first is None else first
-        return first
+        body = (" " + SEMI + " ").join(esc(l) for l in lines)
+        return self.add(f"#X text {x} {y} {body}, f {width};")
+
+
+def wrap(text, width=MAXCH):
+    out, cur = [], ""
+    for w in text.split():
+        if cur and len(cur) + 1 + len(w) > width:
+            out.append(cur); cur = w
+        else:
+            cur = (cur + " " + w).strip()
+    return out + [cur]
 
 
 def build(name, fam, code, ctls):
@@ -87,14 +97,17 @@ def build(name, fam, code, ctls):
 
     # --- layout numbers (all derived, nothing hand-placed) ---
     rows = math.ceil(n / 4)
-    top_y = 130                                   # utility row
-    ctl_y0 = top_y + 56
+    synth, quote = manual_text.FAMILY[fam]
+    synth_lines = wrap(quote)
+    top_y = YEL_Y + 3 * M + 24 + LINE * len(synth_lines) + 28   # metro toggle
+    util_y = top_y + 66                           # utility row
+    ctl_y0 = util_y + 56
     ROW = 90                                      # pitch of the control rows
     last_s = ctl_y0 + ROW * (rows - 1) + 58       # y of the last [s] box
     r_y = last_s + 18 + 20
     obj_y = r_y + 36
     mul_y, dac_y = obj_y + 36, obj_y + 72
-    y = dac_y + 18 + 36                           # first text section
+    y = mul_y + 66 + 18 + 36    # first text section
 
     sections = []
     sections.append(("Inlets", ["0: messages (see Messages below)"]))
@@ -112,12 +125,14 @@ def build(name, fam, code, ctls):
         "store <0-15>, recall <0-15>: 16 internal slots",
         "dump, dump <0-15>: send all controls to outlet 1",
         "dump " + short + " v0 v1 ...: restore a dump of this voice"]))
-    pairs = []
-    for i in range(0, n, 2):
-        a = f"{i} {ctls[i][0].lower()} {ctls[i][1]}"
-        b = f"{i+1} {ctls[i+1][0].lower()} {ctls[i+1][1]}" if i + 1 < n else ""
-        pairs.append(a + (" | " + b if b else ""))
-    sections.append(("Controls (index name default)", pairs))
+    man = manual_text.PARAMS.get(short, {})
+    clines = []
+    for i, (cn, dv) in enumerate(ctls):
+        ln = f"{i} {cn.lower()} ({dv})"
+        if cn in man:
+            ln += ": " + man[cn]
+        clines += wrap(ln)
+    sections.append(("Controls (index name default)", clines))
     sections.append(("Choke and presets", [
         "Outlet 1 sends 'choke' at every trigger. Connect it to the",
         "inlet of another voice to cut that voice off, e.g.",
@@ -130,7 +145,7 @@ def build(name, fam, code, ctls):
         placed.append((title, lines, y))
         y += 24 + LINE * len(lines) + 28
     credits_y = y
-    yel_bottom = credits_y + LINE + M
+    yel_bottom = credits_y + 3 * LINE + M
     bar_bottom = yel_bottom + M
 
     # --- background and bars (z-order: yellow, pink, blue) ---
@@ -140,21 +155,26 @@ def build(name, fam, code, ctls):
 
     # --- title and description ---
     p.heading(CX, YEL_Y + M, obj, 22)
-    p.heading(CX, YEL_Y + 3 * M, f"{role} voice of mdkit ({fam.upper()}-{code.upper()})", 16)
+    p.heading(CX, YEL_Y + 3 * M, f"{role} ({fam.upper()}-{code.upper()}) - {synth}", 16)
+    p.comment(TX, YEL_Y + 3 * M + 24, synth_lines)
 
     # --- example patch: every message row ends in its own [s], one [r] feeds the object ---
     bus = DOLLAR + "0-" + short
     o = p.add(f"#X obj {CX} {obj_y} {obj};")
     rcv = p.add(f"#X obj {CX} {r_y} r {bus};")
     p.conn(rcv, 0, o, 0)
-    snd0 = p.add(f"#X obj {CX} {top_y + 30} s {bus};")
-    bng = p.add(f"#X obj {CX} {top_y} bng 19 250 50 0 empty empty empty 17 7 0 10 #fcfcfc #000000 #000000;")
+    snd0 = p.add(f"#X obj {CX} {util_y + 30} s {bus};")
+    tgl = p.add(f"#X obj {CX} {top_y} tgl 19 0 empty empty empty 0 -10 0 12 #fcfcfc #000000 #000000 0 1;")
+    met = p.add(f"#X obj {CX} {top_y + 28} metro 500;")
+    p.conn(tgl, 0, met, 0)
+    p.conn(met, 0, snd0, 0)
+    bng = p.add(f"#X obj {CX} {util_y} bng 19 250 50 0 empty empty empty 17 7 0 10 #fcfcfc #000000 #000000;")
     p.conn(bng, 0, snd0, 0)
-    vel = p.add(f"#X floatatom {CX + 40} {top_y} 4 1 127 0 - - - 0;")
+    vel = p.add(f"#X floatatom {CX + 40} {util_y} 4 1 127 0 - - - 0;")
     p.conn(vel, 0, snd0, 0)
     x = CX + 100
     for text in ("dump", "defaults", "choke", "print", "store 0", "recall 0"):
-        m = p.add(f"#X msg {x} {top_y} {text};")
+        m = p.add(f"#X msg {x} {util_y} {text};")
         p.conn(m, 0, snd0, 0)
         x += 7 * len(text) + 4 + 16
     snds = {}
@@ -165,7 +185,7 @@ def build(name, fam, code, ctls):
         ay = ctl_y0 + ROW * r
         if r not in snds:
             snds[r] = p.add(f"#X obj {CX} {ay + 58} s {bus};")
-        a = p.add(f"#X floatatom {cx} {ay} 4 0 127 0 - - - 0;")
+        a = p.add(f"#X floatatom {cx} {ay} 4 0 127 0 - {DOLLAR}0-c{i} -;")
         atoms.append(a)
         m = p.add(f"#X msg {cx} {ay + 30} {cname.lower()} {DOLLAR}1;")
         p.conn(a, 0, m, 0)
@@ -177,8 +197,9 @@ def build(name, fam, code, ctls):
     n = len(ctls)
     up = p.add(f"#X obj {CX + 110} {mul_y + 30} unpack {' '.join(['f'] * n)};")
     p.conn(rt, 0, up, 0)
-    for i, a in enumerate(atoms):
-        p.conn(up, i, a, 0)
+    for i in range(n):       # feed the number boxes back through their receive names
+        sx = p.add(f"#X obj {CX + 62 * i} {mul_y + 66} s {DOLLAR}0-c{i};")
+        p.conn(up, i, sx, 0)
     p.conn(o, 1, rt, 0)
     p.conn(o, 0, mul, 0)
     p.conn(mul, 0, dac, 0)
@@ -189,9 +210,11 @@ def build(name, fam, code, ctls):
     for title, lines, sy in placed:
         p.heading(CX, sy, title, 14)
         p.comment(TX, sy + 24, lines)
-    p.comment(TX, credits_y, ["Credits: mdkit by soejrd (CC0), Pd wrapper skandrums-pd (CC0)"])
+    p.comment(TX, credits_y, ["Credits: mdkit by soejrd (CC0)",
+                              "Pd wrapper skandrums-pd (CC0), built with Claude (Anthropic)",
+                              "Machine texts: Elektron Machinedrum manual, Appendix A"])
 
-    head = f"#N canvas 348 263 {YEL_X + YEL_W + 2 * M + 20} 700 12;"
+    head = f"#N canvas 348 20 {YEL_X + YEL_W + 2 * M + 20} {bar_bottom + M} 12;"
     return head + "\n" + "\n".join(p.lines) + "\n" + "\n".join(p.conns) + "\n"
 
 
