@@ -166,9 +166,9 @@ def build(name, fam, code, ctls):
     met = p.add(f"#X obj {CX} {top_y + 28} metro 500;")
     p.conn(tgl, 0, met, 0)
     p.conn(met, 0, snd0, 0)
-    bng = p.add(f"#X obj {CX} {util_y} bng 19 250 50 0 empty empty empty 17 7 0 10 #fcfcfc #000000 #000000;")
+    bng = p.add(f"#X obj {CX + 6} {util_y} bng 19 250 50 0 empty empty empty 17 7 0 10 #fcfcfc #000000 #000000;")
     p.conn(bng, 0, snd0, 0)
-    vel = p.add(f"#X floatatom {CX + 40} {util_y} 4 1 127 0 - - - 0;")
+    vel = p.add(f"#X msg {CX + 41} {util_y} 100;")
     p.conn(vel, 0, snd0, 0)
     x = CX + 100
     for text in ("dump", "defaults", "choke", "print", "store 0", "recall 0"):
