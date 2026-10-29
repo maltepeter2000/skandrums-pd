@@ -106,12 +106,12 @@ def build(name, fam, code, ctls):
     r_y = last_s + 18 + 20
     obj_y = r_y + 36
     mul_y, dac_y = obj_y + 36, obj_y + 72
-    y = mul_y + 66 + 18 + 36    # first text section
+    y = mul_y + 66 + 18 + 36 + 20    # first text section
 
     sections = []
     sections.append(("Inlets", ["0: messages (see Messages below)"]))
     sections.append(("Outlets", ["0: signal (mono)",
-                                 "1: events: choke, done, value, dump"]))
+                                 "1: events: choke, done, value, dump, params"]))
     sections.append(("Messages", [
         "bang, <1-127>: trigger, the number is the velocity",
         "<control> <0-127>: set a control by name, e.g. " + ctls[0][0].lower() + " 64",
@@ -122,6 +122,7 @@ def build(name, fam, code, ctls):
         "print: voice, controls and sample rate to the Pd window",
         "choke, chokems <ms>: fade the voice out, default 3 ms",
         "store <0-15>, recall <0-15>: 16 internal slots",
+        "recall, defaults: report 'params v0 v1 ...' on outlet 1",
         "dump, dump <0-15>: send all controls to outlet 1",
         "dump " + short + " v0 v1 ...: restore a dump of this voice"]))
     man = manual_text.PARAMS.get(short, {})
@@ -191,6 +192,7 @@ def build(name, fam, code, ctls):
     mul = p.add(f"#X obj {CX} {mul_y} *~ 0.3;")
     dac = p.add(f"#X obj {CX} {dac_y} dac~;")
     pr = p.add(f"#X obj {CX + 330} {mul_y} print {short.upper()};")
+    p.add(f"#X text {CX} {mul_y + 90} 'params' from recall/defaults updates the number boxes, f 62;")
     rt = p.add(f"#X obj {CX + 110} {mul_y} route params;")
     n = len(ctls)
     up = p.add(f"#X obj {CX + 110} {mul_y + 30} unpack {' '.join(['f'] * n)};")
