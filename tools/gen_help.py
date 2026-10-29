@@ -98,8 +98,7 @@ def build(name, fam, code, ctls):
     # --- layout numbers (all derived, nothing hand-placed) ---
     rows = math.ceil(n / 4)
     synth, quote = manual_text.FAMILY[fam]
-    synth_lines = wrap(quote)
-    top_y = YEL_Y + 3 * M + 24 + LINE * len(synth_lines) + 28   # metro toggle
+    top_y = YEL_Y + 3 * M + 24 + 28   # metro toggle
     util_y = top_y + 66                           # utility row
     ctl_y0 = util_y + 56
     ROW = 90                                      # pitch of the control rows
@@ -156,7 +155,6 @@ def build(name, fam, code, ctls):
     # --- title and description ---
     p.heading(CX, YEL_Y + M, obj, 22)
     p.heading(CX, YEL_Y + 3 * M, f"{role} ({fam.upper()}-{code.upper()}) - {synth}", 16)
-    p.comment(TX, YEL_Y + 3 * M + 24, synth_lines)
 
     # --- example patch: every message row ends in its own [s], one [r] feeds the object ---
     bus = DOLLAR + "0-" + short
