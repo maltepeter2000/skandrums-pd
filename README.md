@@ -141,22 +141,6 @@ Retrigger), Controls, Presets und `done`. Dazu erzeugt `tests/pd/gen_events.py` 
 `src/` ist der Pd-Wrapper dieses Projekts. Der Resampler `src/skres.c` stammt aus den früheren
 digidrum-Externals.
 
-## Bela: Slot-Instrument (8 Slots, MIDI, Buttons, Potis)
+## Note und Tonhöhe: `note`
 
-`make bela` erzeugt in `bela/` das komplette Projekt (`_main.pd`, `slot1..8.pd`, `skpot.pd`). `make test-slots` spielt jede der 33 Maschinen durch (jeder Slot muss klingen, die anderen still bleiben).
-
-**Slots (feste Stereoposition, Pan 0..1)**: 1 kick, 2 snare, 3 clap/rim, 4 closed hat, 5 open hat, 6 cymbal, 7 tom, 8 perc. Die Maschinenlisten stehen oben in `tools/gen_bela.py` (`SLOTS`). Closed hat (Slot 4) choked open hat (Slot 5).
-
-**MIDI** (Kanal = Slot 1..8):
-
-| Nachricht | Wirkung |
-|---|---|
-| Note On | triggert die Maschine, Velocity wird übernommen. Maschinen mit `PTCH`-Tabelle (siehe `data/ptch/SUMMARY.md`) stimmen sich nach der Note, die übrigen triggern nur |
-| CC 7 / CC 10 | Level / Pan des Slots |
-| CC 70 | Maschinenwahl (0..127 verteilt auf die Maschinen des Slots) |
-| CC 71 | Preset-Step 0..15 (`skpreset`, Wert / 8) |
-| CC 16..23 | Control 0..7 der aktuellen Maschine (0..127) |
-
-**Bedienung**: Taster 1/2 = Slot zurück/vor, Taster 3/4 = Maschine zurück/vor. Die LEDs zeigen den gewählten Slot, nach einem Maschinenwechsel 0,7 s lang die Maschinennummer als Balken. Die 8 Potis (`adc~ 3..10`) steuern die Controls 0..7 mit Pickup: nach Slot-, Maschinen- oder Preset-Wechsel greift ein Poti erst, wenn es in die Nähe des aktuellen Werts kommt (±8). Bei getunten Maschinen wirkt Poti 1 als Transpose (±12 Halbtöne) statt als `PTCH`.
-
-**Installation auf dem Bela**: Externals und `pd/skpreset.pd` nach `/root/Bela/projects/pd-externals/skandrums/`, die Dateien aus `bela/` in ein neues Projekt kopieren. In den Projekt-Settings Blockgröße 32 (`-p 32`) und den USB-MIDI-Port eintragen. Wenn die Taster beim Loslassen statt beim Drücken reagieren, in `_main.pd` die vier `[sel 0]` hinter den Tastern auf `[sel 1]` ändern.
+`note <midinote> [velocity]` setzt bei 14 Stimmen `PTCH` aus einer gemessenen Tabelle (`data/ptch/`, Übersicht in `SUMMARY.md`) und triggert. Alle anderen Stimmen triggern nur. `transpose <halbtöne>` verschiebt die Tonhöhe. Neu messen: `make ptch`.

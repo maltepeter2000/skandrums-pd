@@ -90,14 +90,7 @@ install: all
 clean:
 	rm -rf out
 
-.PHONY: all test help bench install clean bela test-slots ptch
-
-# Bela slot instrument (8 slots, MIDI, buttons, pots) -> bela/*.pd
-bela:
-	python3 tools/gen_bela.py
-
-test-slots: all bela
-	python3 tools/test_slots.py
+.PHONY: all test help bench install clean ptch
 
 # re-measure PTCH -> note tables (writes data/ptch, src/skptch.h)
 ptch:
