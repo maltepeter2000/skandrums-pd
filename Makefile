@@ -65,6 +65,15 @@ out/test_core: tests/test_core.c src/skcore.c src/skres.c $(HDRS) out/voices_gen
 test: out/test_core
 	./out/test_core
 
+out/dump_voices: tools/dump_voices.c out/voices_gen.h $(VOICE_SRC)
+	$(CC) -std=gnu99 -O2 -Wno-misleading-indentation -Isrc -Imdkit/include -Iout $(VOICE_INC) \
+	  tools/dump_voices.c $(VOICE_SRC) -lm -o $@
+
+# generate help patches (needs python3)
+help: out/dump_voices
+	./out/dump_voices > out/voices.txt
+	python3 tools/gen_help.py out/voices.txt help
+
 install: all
 	mkdir -p "$(INSTALLDIR)"
 	cp out/*.$(EXT) "$(INSTALLDIR)/"
@@ -73,4 +82,4 @@ install: all
 clean:
 	rm -rf out
 
-.PHONY: all test install clean
+.PHONY: all test help install clean
