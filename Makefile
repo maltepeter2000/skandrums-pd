@@ -29,7 +29,7 @@ ALL_VOICES := $(sort $(patsubst mdkit/src/%,%,$(patsubst %/,%,$(dir $(wildcard m
 VOICES ?= $(ALL_VOICES)
 
 COMMON = src/skdrums_tilde.c src/skcore.c src/skres.c
-HDRS   = src/skcore.h src/skres.h
+HDRS   = src/skcore.h src/skres.h src/skptch.h
 
 OUTS :=
 define VOICE_RULE

@@ -4,6 +4,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include "skcore.h"
+#include "skptch.h"
 
 /* wrapper-level default overrides (take precedence over mdkit's table) */
 static const struct { const char *name; unsigned char d[MDKIT_MAX_CONTROLS]; } overrides[] = {
@@ -113,6 +114,21 @@ void skcore_trigger(skcore *c, int velocity)
     if (!c->active) skres_reset(&c->rs);   /* an idle voice is not rendered, drop stale history */
     c->v->trigger(c->state);
     c->active = 1; c->quiet = 0; c->idle = 0; c->armed = 0; c->done_pending = 0;
+}
+
+int skcore_note(skcore *c, double note, int velocity)
+{
+    unsigned i; int ptch = skcore_find_control(c, "PTCH"), n, found = 0;
+    n = (int)floor(note + c->transpose + 0.5);
+    if (n < 0) n = 0;
+    if (n > 127) n = 127;
+    for (i = 0; i < sizeof sk_ptch_tables / sizeof *sk_ptch_tables; ++i)
+        if (ptch >= 0 && !strcmp(sk_ptch_tables[i].name, c->v->name)) {
+            skcore_set_control(c, (unsigned)ptch, sk_ptch_tables[i].tab[n]);
+            found = 1; break;
+        }
+    skcore_trigger(c, velocity);
+    return found;
 }
 
 void skcore_choke(skcore *c)
