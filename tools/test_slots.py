@@ -14,7 +14,13 @@ for k,(nm,pan,ms) in enumerate(SLOTS):
     r=p.add(f"r sk-in-{k}",10+k*150,60); s=p.add(f"slot{k+1}",10+k*150,90); p.con(r,0,s,0)
     e=p.add("env~ 2048 1024",10+k*150,120); pr=p.add(f"print E{k}",10+k*150,150)
     p.con(s,0,e,0); p.con(s,1,e,0); p.con(e,0,pr,0)
-T=1500; i=0; plan=[]
+T=1500+len(SLOTS)*1200; i=0; plan=[]
+# regression: right after load a note must sound without any 'machine' message (index defaults to machine 0)
+for k,(nm,pan,ms) in enumerate(SLOTS):
+    t0=1200+k*1200
+    d2=p.add(f"del {t0}",10,160+k*12); nn=p.add("note 40 110",400,160+k*12,"msg"); sb=p.add(f"s sk-in-{k}",500,160+k*12)
+    mk=p.add(f"MARK {k} 0 {ms[0]}-init",600,160+k*12,"msg"); pm=p.add("print",760,160+k*12)
+    p.con(lb,0,d2,0); p.con(d2,0,nn,0); p.con(nn,0,sb,0); p.con(d2,0,mk,0); p.con(mk,0,pm,0); plan.append((k,0,ms[0]+'-init'))
 for k,(nm,pan,ms) in enumerate(SLOTS):
     for m,name in enumerate(ms):
         t0=T+i*1200

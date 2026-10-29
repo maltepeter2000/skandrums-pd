@@ -95,6 +95,7 @@ def slot(idx, name, pan, machines):
     # initial level/pan on load
     lb=p.add("loadbang",700,20); t2=p.add("t b b",700,50)
     il=p.add("0.8",700,80,"msg"); ip=p.add("%g"%pan,790,80,"msg")
+    m0=p.add("0",700,110,"msg"); p.con(t2,0,m0,0); p.con(m0,0,ii,0)    # select machine 0 so the index is set from the start
     p.con(lb,0,t2,0); p.con(t2,0,il,0); p.con(t2,1,ip,0); p.con(il,0,lv,0); p.con(ip,0,pn,0)
     return p
 
