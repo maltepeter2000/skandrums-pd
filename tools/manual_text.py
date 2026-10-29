@@ -1,8 +1,5 @@
-"""Texts taken from the Elektron Machinedrum manual (OS 1.63), Appendix A,
-read from the online copy at manualsdir.com (the PDF itself is not reachable
-from the build machine). Only machines whose text could be read are listed;
-controls without an entry are shown with name and default only.
-EFM and PI-RC/PI-CC (and TRX-SD) are still missing: fill in when available."""
+"""Texts from the Elektron Machinedrum manual (OS 1.63), Appendix A,
+taken from the original PDF. Every control of all 30 voices has an entry."""
 
 FAMILY = {
     # (short synthesis name, manual sentence or None)
@@ -79,3 +76,59 @@ PARAMS = {
                  BR="Controls the low frequences of the sound.",
                  CLOS="Time to closing the hi hat. 127 means it does not close."),
 }
+
+# ---- added from the original PDF (Appendix A, OS 1.63) ----
+MOD = "The frequency modulation depth."
+MFRQ = "The modulation frequency."
+MDEC = "The modulation decay time."
+FB = "Feedback amount."
+HPF_F = "High pass filter frequency."
+RAMP_D = "The pitch ramp depth."
+RDEC_D = "The pitch ramp decay time. A higher value gives a longer decay."
+GRAB = ("Sets the time to grabbing the cymbal. A value of 127 means "
+        "that the cymbal is never grabbed.")
+
+PARAMS.update({
+    "trxsd": dict(PTCH=PTCH, DEC=DEC, BUMP="Adds a pitch shift at the start.",
+                  BENV="Controls the envelope of the bump.", SNAP="Amount of snap.",
+                  TONE="Changes tonal quality.", TUNE="Detunes the drum.",
+                  CLIP="A special type of distortion."),
+    "efmbd": dict(PTCH=PTCH, DEC=DEC, RAMP=RAMP_D, RDEC=RDEC_D, MOD=MOD, MFRQ=MFRQ,
+                  MDEC=MDEC, MFB="Modulation feedback."),
+    "efmsd": dict(PTCH=PTCH, DEC=DEC, NOIS="The amount of noise in the snare drum.",
+                  NDEC="Noise decay time.", MOD=MOD, MFRQ=MFRQ, MDEC=MDEC, HPF=HPF_F),
+    "efmxt": dict(PTCH=PTCH, DEC=DEC, RAMP=RAMP_D, RDEC=RDEC_D, MOD=MOD, MFRQ=MFRQ,
+                  MDEC=MDEC, CLIC="Adds a click to the start of the drum."),
+    "efmcp": dict(PTCH=PTCH, DEC=DEC, CLPS="The number of claps.",
+                  CDEC="The clap decay time. A higher value gives a longer decay.",
+                  MOD=MOD, MFRQ=MFRQ, MDEC=MDEC, HPF=HPF_F),
+    "efmrs": dict(PTCH=PTCH, DEC=DEC, MOD=MOD, HPF=HPF_F,
+                  SNAR="Adds snare drum timbre to the sound.",
+                  SPTC="The pitch of the snare drum timbre.",
+                  SDEC="The decay of the snare drum timbre.",
+                  SMOD="The modulation depth of the snare drum timbre."),
+    "efmcb": dict(PTCH="Controls the basic pitch.", DEC=DEC,
+                  SNAP="The amount of snap in the beginning of the sound.", FB=FB,
+                  MOD=MOD, MFRQ=MFRQ, MDEC=MDEC),
+    "efmhh": dict(PTCH="Controls the basic pitch of the hihat.", DEC=DEC,
+                  TREM="Depth of the added tremolo.", TFRQ="Frequency of the tremolo.",
+                  MOD=MOD, MFRQ=MFRQ, MDEC=MDEC, FB=FB),
+    "efmcy": dict(PTCH="Controls the basic pitch of the cymbal.", DEC=DEC, FB=FB,
+                  HPF=HPF_F, MOD=MOD, MFRQ=MFRQ, MDEC=MDEC),
+    "pirc": dict(PTCH="Controls the basic pitch of the ride.", DEC="Sets the decay time of the ride.",
+                 HARD="Adds the impression of a hard hit.",
+                 RING="Controls the amount of ringing in the sound.",
+                 AG="Enhances the high frequencies of the sound.",
+                 AU="Decreases the high frequencies of the sound.",
+                 BR="Controls the low frequences of the sound.", GRAB=GRAB),
+    "picc": dict(PTCH="Controls the basic pitch of the crash.", DEC="Sets the decay time of the crash.",
+                 HARD="Adds the impression of a hard hit.",
+                 RING="Controls the amount of ringing in the sound.",
+                 AG="Enhances the high frequencies of the sound.",
+                 AU="Decreases the high frequencies of the sound.",
+                 BR="Controls the low frequences of the sound.", GRAB=GRAB),
+})
+# the OH page lists the same parameters as CH
+PARAMS["trxoh"] = dict(PARAMS["trxch"])
+FAMILY["efm"] = ("Enhanced Feedback Modulation",
+                 'Manual: "The EFM MD-synth introduces Elektron\'s Enhanced Feedback Modulation algorithms."')

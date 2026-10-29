@@ -1,7 +1,7 @@
-#N canvas 348 20 800 1284 12;
-#X obj 40 20 cnv 19 700 1224 empty empty empty 20 12 0 30 #fafaf2 #000000 0;
-#X obj 20 80 cnv 19 20 1184 empty empty empty 20 12 0 30 #ffcfd6 #000000 0;
-#X obj 560 140 cnv 19 200 1124 empty empty empty 20 12 0 30 #1e3791 #000000 0;
+#N canvas 348 20 800 1208 12;
+#X obj 40 20 cnv 19 700 1148 empty empty empty 20 12 0 30 #fafaf2 #000000 0;
+#X obj 20 80 cnv 19 20 1108 empty empty empty 20 12 0 30 #ffcfd6 #000000 0;
+#X obj 560 140 cnv 19 200 1048 empty empty empty 20 12 0 30 #1e3791 #000000 0;
 #X obj 60 40 cnv 10 10 10 empty empty skpreset 24 6 0 22 #1e3791 #000000 0;
 #X obj 60 80 cnv 10 10 10 empty empty Step\ values\ for\ one\ voice\ -\ parameter-lock\ style 24 6 0 16 #1e3791 #000000 0;
 #X obj 60 188 s \$0-v;
@@ -34,7 +34,6 @@
 #X text 82 952 1 The current slot is written (the voice is asked for a dump). \; 2 The new slot is selected. \; 3 Its line is loaded into the voice. An empty slot keeps the \; current sound and is filled with it. \; Edits are therefore kept per slot \, like step locks., f 64;
 #X obj 60 1060 cnv 10 10 10 empty empty The\ text 24 6 0 14 #1e3791 #000000 0;
 #X text 82 1084 One line per slot \, line number = slot number. Double-click \; [text define] to edit it\; 'write file' and 'read file' save \; or load a bank. A line only loads into its own voice type \; (trxb2 into trxb2~). '-' marks an empty slot., f 64;
-#X text 82 1176 Credits: idea and first patch by Peter \; Pd wrapper skandrums-pd (CC0) \, built with Claude (Anthropic) \; Part of skandrums-pd \, see the voice help files, f 64;
 #X connect 6 0 7 0;
 #X connect 7 0 5 0;
 #X connect 8 0 5 0;

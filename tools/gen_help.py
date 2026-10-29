@@ -128,7 +128,7 @@ def build(name, fam, code, ctls):
     for i, (cn, dv) in enumerate(ctls):
         ln = f"{i} {cn.lower()} ({dv})"
         if cn in man:
-            ln += ": " + man[cn]
+            ln += " " + man[cn]
         clines += wrap(ln)
     sections.append(("Controls (index name default)", clines))
     sections.append(("Choke", [
@@ -259,7 +259,7 @@ def build_skpreset_help():
         placed.append((title, lines, y))
         y += 24 + LINE * len(lines) + 28
     credits_y = y
-    yel_bottom = credits_y + 3 * LINE + M
+    yel_bottom = credits_y - 28 + M
     bar_bottom = yel_bottom + M
     p.cnv(YEL_X, YEL_Y, YEL_W, yel_bottom - YEL_Y, bg=YELLOW)
     p.cnv(PINK_X, PINK_TOP, PINK_W, bar_bottom - PINK_TOP, bg=PINK)
@@ -297,9 +297,6 @@ def build_skpreset_help():
     for title, lines, sy in placed:
         p.heading(CX, sy, title, 14)
         p.comment(TX, sy + 24, lines)
-    p.comment(TX, credits_y, ["Credits: idea and first patch by Peter",
-                              "Pd wrapper skandrums-pd (CC0), built with Claude (Anthropic)",
-                              "Part of skandrums-pd, see the voice help files"])
     head = f"#N canvas 348 20 {YEL_X + YEL_W + 2 * M + 20} {bar_bottom + M} 12;"
     return head + "\n" + "\n".join(p.lines) + "\n" + "\n".join(p.conns) + "\n"
 

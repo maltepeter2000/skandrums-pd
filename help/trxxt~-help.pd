@@ -41,7 +41,7 @@
 #X obj 60 754 cnv 10 10 10 empty empty Messages 24 6 0 14 #1e3791 #000000 0;
 #X text 82 778 bang \, <1-127>: trigger \, the number is the velocity \; <control> <0-127>: set a control by name \, e.g. ptch 64 \; ctl <index> <0-127> \, params v0 v1 ...: set by index \; defaults \, reset: default controls \, restart the voice \; level <0-8>: output gain \, default 1 \; get <control>: reply 'value <control> <v>' on outlet 1 \; print: voice \, controls and sample rate to the Pd window \; choke \, chokems <ms>: fade the voice out \, default 3 ms \; dump: send all controls to outlet 1 as 'dump trxxt v0 ..' \; dump trxxt v0 v1 ...: restore such a dump (this voice only), f 64;
 #X obj 60 966 cnv 10 10 10 empty empty Controls\ (index\ name\ default) 24 6 0 14 #1e3791 #000000 0;
-#X text 82 990 0 ptch (70): Controls the basic pitch of the drum. \; 1 dec (25): Controls the decay time. \; 2 ramp (50): Ramps the pitch. \; 3 rdec (30): Speed of pitch ramp. \; 4 damp (64): Dampens the decay. \; 5 dist (32): Distortion. \; 6 dtyp (0): Hardness of the distortion., f 64;
+#X text 82 990 0 ptch (70) Controls the basic pitch of the drum. \; 1 dec (25) Controls the decay time. \; 2 ramp (50) Ramps the pitch. \; 3 rdec (30) Speed of pitch ramp. \; 4 damp (64) Dampens the decay. \; 5 dist (32) Distortion. \; 6 dtyp (0) Hardness of the distortion., f 64;
 #X obj 60 1130 cnv 10 10 10 empty empty Choke 24 6 0 14 #1e3791 #000000 0;
 #X text 82 1154 Outlet 1 sends 'choke' at every trigger. Connect it to the \; inlet of another voice to cut that voice off \, e.g. \; [trxch~] outlet 1 -> [trxoh~] inlet., f 64;
 #X obj 60 1230 cnv 10 10 10 empty empty Presets\ and\ steps 24 6 0 14 #1e3791 #000000 0;

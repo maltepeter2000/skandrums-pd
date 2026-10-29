@@ -37,7 +37,7 @@
 #X obj 60 754 cnv 10 10 10 empty empty Messages 24 6 0 14 #1e3791 #000000 0;
 #X text 82 778 bang \, <1-127>: trigger \, the number is the velocity \; <control> <0-127>: set a control by name \, e.g. grns 64 \; ctl <index> <0-127> \, params v0 v1 ...: set by index \; defaults \, reset: default controls \, restart the voice \; level <0-8>: output gain \, default 1 \; get <control>: reply 'value <control> <v>' on outlet 1 \; print: voice \, controls and sample rate to the Pd window \; choke \, chokems <ms>: fade the voice out \, default 3 ms \; dump: send all controls to outlet 1 as 'dump pima v0 ..' \; dump pima v0 v1 ...: restore such a dump (this voice only), f 64;
 #X obj 60 966 cnv 10 10 10 empty empty Controls\ (index\ name\ default) 24 6 0 14 #1e3791 #000000 0;
-#X text 82 990 0 grns (90): Adjusts the number of grains in the maraca. \; 1 dec (0): Sets the decay time of the maraca. \; 2 glen (72): Adjusts the decay time for the individual grains. \; 3 size (96): Regulates the size of the maraca. \; 4 hard (64): Regulates the hardness of the grains., f 64;
+#X text 82 990 0 grns (90) Adjusts the number of grains in the maraca. \; 1 dec (0) Sets the decay time of the maraca. \; 2 glen (72) Adjusts the decay time for the individual grains. \; 3 size (96) Regulates the size of the maraca. \; 4 hard (64) Regulates the hardness of the grains., f 64;
 #X obj 60 1098 cnv 10 10 10 empty empty Choke 24 6 0 14 #1e3791 #000000 0;
 #X text 82 1122 Outlet 1 sends 'choke' at every trigger. Connect it to the \; inlet of another voice to cut that voice off \, e.g. \; [trxch~] outlet 1 -> [trxoh~] inlet., f 64;
 #X obj 60 1198 cnv 10 10 10 empty empty Presets\ and\ steps 24 6 0 14 #1e3791 #000000 0;
