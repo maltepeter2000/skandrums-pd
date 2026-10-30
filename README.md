@@ -13,8 +13,6 @@ License: CC0 1.0, same as mdkit.
 | macOS | builds as a universal binary (arm64 + x86_64) |
 | Bela Pepper | built on the board, loads in Pd 0.55-2, plays (image v0.3.8h, block size 32) |
 
-A drum rack for the Bela Pepper (4 slots, MIDI, buttons, LEDs, pots) lives in a separate repository:
-[beladrumrack](https://github.com/maltepeter2000/beladrumrack).
 
 ## Objects
 
