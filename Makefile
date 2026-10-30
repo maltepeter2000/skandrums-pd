@@ -4,22 +4,32 @@
 #   make test             core tests without Pd
 #   make install          copy into the user externals folder
 #   make PDINC=/path/to/dir/with/m_pd.h    if auto-detection fails
+#   Windows (MSYS2 MinGW-w64 shell):  make PDDIR="C:/Program Files/Pd"
 .DEFAULT_GOAL := all
 UNAME := $(shell uname -s)
 
-CFLAGS += -O2 -std=gnu99 -Wall -Wno-unused-parameter -Wno-misleading-indentation -fPIC -fvisibility=hidden \
+CFLAGS += -O2 -std=gnu99 -Wall -Wno-unused-parameter -Wno-misleading-indentation -fvisibility=hidden \
           -Isrc -Imdkit/include
 
-ifeq ($(UNAME),Darwin)
+ifeq ($(OS),Windows_NT)
+  # MSYS2 / MinGW-w64: link against pd.dll from the Pd installation
+  EXT      = dll
+  PDDIR   ?= C:/Program Files/Pd
+  PDINC   ?= $(PDDIR)/src
+  PDBIN   ?= $(PDDIR)/bin
+  LDFLAGS += -shared -static-libgcc -L"$(PDBIN)" -lpd
+  INSTALLDIR ?= $(APPDATA)/Pd
+else ifeq ($(UNAME),Darwin)
   EXT      = pd_darwin
   PDINC   ?= $(lastword $(sort $(wildcard /Applications/Pd-*.app/Contents/Resources/src)))
   ARCH    ?= -arch arm64 -arch x86_64
-  CFLAGS  += $(ARCH) -mmacosx-version-min=10.13
+  CFLAGS  += -fPIC $(ARCH) -mmacosx-version-min=10.13
   LDFLAGS += -bundle -undefined dynamic_lookup $(ARCH)
   INSTALLDIR ?= $(HOME)/Documents/Pd/externals
 else
   EXT      = pd_linux
   PDINC   ?= /usr/include/pd
+  CFLAGS  += -fPIC
   LDFLAGS += -shared -fPIC
   INSTALLDIR ?= $(HOME)/pd-externals
 endif
@@ -35,7 +45,7 @@ OUTS :=
 define VOICE_RULE
 OUTS += out/$(subst /,,$(1))~.$(EXT)
 out/$(subst /,,$(1))~.$(EXT): $(COMMON) $(HDRS) mdkit/src/$(1)/mdkit_$(subst /,_,$(1)).c | out
-	$$(CC) $$(CFLAGS) -I$$(PDINC) -Imdkit/src/$(1) \
+	$$(CC) $$(CFLAGS) -I"$$(PDINC)" -Imdkit/src/$(1) \
 	  -DSK_OBJ_NAME='"$(subst /,,$(1))~"' -DSK_SHORT='"$(subst /,,$(1))"' \
 	  -DSK_SETUP=$(subst /,,$(1))_tilde_setup -DSK_VOICE=mdkit_voice_$(subst /,_,$(1)) \
 	  -DSK_HEADER='"mdkit_$(subst /,_,$(1)).h"' \

@@ -11,6 +11,7 @@ License: CC0 1.0, same as mdkit.
 | --- | --- |
 | Linux (desktop) | builds, `make test` passes (30 voices, 924 checks) |
 | macOS | builds as a universal binary (arm64 + x86_64) |
+| Windows (PC) | builds with MinGW-w64 (cross-compiled and linked, setup function exported); not yet run on a Windows PC |
 | Bela Pepper | built on the board, loads in Pd 0.55-2, plays (image v0.3.8h, block size 32) |
 
 
@@ -135,6 +136,34 @@ Restart Pd afterwards. If the headers are not found, pass `PDINC=/path/to/dir/wi
     make install                   # copies to ~/pd-externals
 
 Add `~/pd-externals` to the Pd search path (Preferences > Path) and restart Pd.
+
+### Desktop: Windows (PC)
+
+64-bit Pd vanilla for Windows and the MinGW-w64 toolchain from MSYS2. The build was checked with a
+MinGW-w64 cross compiler; it has not yet been run on a real Windows PC, so please report problems.
+
+1. Install [Pd vanilla](https://puredata.info/downloads/pure-data) (64-bit installer) and
+   [MSYS2](https://www.msys2.org).
+2. Open the **MSYS2 MinGW x64** shell (not the plain "MSYS2 MSYS" one) and install the tools:
+
+        pacman -S --needed make mingw-w64-x86_64-gcc
+
+3. Go to the source folder (unzip the repository, then `cd /c/Users/<you>/Downloads/skandrums-pd-main`)
+   and build:
+
+        make PDDIR="C:/Program Files/Pd"     # -> out/*.dll
+
+   `PDDIR` is the Pd installation folder; it must contain `src/m_pd.h` and `bin/pd.dll`. Change it
+   if Pd is installed elsewhere. Alternatively pass `PDINC=` (header folder) and `PDBIN=` (folder
+   with `pd.dll`) separately.
+4. Install:
+
+        make install                         # copies to %APPDATA%\Pd
+
+   Pd searches `%APPDATA%\Pd` by default; otherwise add the folder under File > Preferences > Path.
+   Restart Pd afterwards.
+
+`make test` also works in this shell.
 
 ### Bela (tested on the Bela Pepper)
 

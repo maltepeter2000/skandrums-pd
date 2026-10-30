@@ -15,7 +15,9 @@
 #include SK_HEADER
 #include "skcore.h"
 
-#if defined(__GNUC__)
+#if defined(_WIN32) || defined(__CYGWIN__)
+#define SK_EXPORT __declspec(dllexport)
+#elif defined(__GNUC__)
 #define SK_EXPORT __attribute__((visibility("default")))
 #else
 #define SK_EXPORT
