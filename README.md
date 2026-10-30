@@ -2,7 +2,8 @@
 
 Pure Data externals for the 30 drum voices of [mdkit](https://github.com/soejrd/mdkit):
 one object per voice, for example `[trxb2~]`, `[trxch~]`, `[efmbd~]`, `[pisd~]`.
-All objects are built from the same source file (`src/skdrums_tilde.c`) and include a helpfile; only the voice changes.
+All objects are built from the same source file (`src/skdrums_tilde.c`); only the voice changes.
+Includes a preset storage and recall system that works on a per step basis. 
 License: CC0 1.0, same as mdkit.
 
 **Status**
