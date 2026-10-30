@@ -93,6 +93,8 @@ audio block.
 
 ## Presets and steps: `[skpreset]`
 
+This is a supplement to the Pure Data adaptation. It is an attempt to create an easy way changing a set of sound parameters as in "parameter locks". 
+
 `dump` returns the current state as a message, `dump <name> v0 v1 ...` restores it.
 The name after `dump` is the object name; a message with a different name is ignored.
 
