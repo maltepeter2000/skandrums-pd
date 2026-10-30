@@ -138,19 +138,6 @@ static void sk_anything(t_sk *x, t_symbol *s, int argc, t_atom *argv)
                 outlet_anything(x->o_ev, gensym("value"), 2, a);
             }
         }
-    } else if (!strcmp(m, "note")) {
-        /* note <midinote> [velocity]: PTCH from the measured table (if any), then trigger */
-        if (argc >= 1 && argv[0].a_type == A_FLOAT) {
-            int vel = argc >= 2 ? iround(atom_getfloat(argv + 1)) : 127;
-            if (vel <= 0) return;           /* note-off */
-            if (vel > 127) vel = 127;
-            if (x->ok) {
-                skcore_note(&x->c, atom_getfloat(argv), vel);
-                outlet_anything(x->o_ev, gensym("choke"), 0, NULL);
-            }
-        } else pd_error(x, SK_OBJ_NAME ": usage: note <midinote> [velocity]");
-    } else if (!strcmp(m, "transpose")) {
-        x->c.transpose = argc >= 1 ? atom_getfloat(argv) : 0;
     } else if (!strcmp(m, "defaults")) {
         skcore_defaults(&x->c);
     } else if (!strcmp(m, "level")) {

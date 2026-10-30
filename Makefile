@@ -29,7 +29,7 @@ ALL_VOICES := $(sort $(patsubst mdkit/src/%,%,$(patsubst %/,%,$(dir $(wildcard m
 VOICES ?= $(ALL_VOICES)
 
 COMMON = src/skdrums_tilde.c src/skcore.c src/skres.c
-HDRS   = src/skcore.h src/skres.h src/skptch.h
+HDRS   = src/skcore.h src/skres.h
 
 OUTS :=
 define VOICE_RULE
@@ -90,10 +90,4 @@ install: all
 clean:
 	rm -rf out
 
-.PHONY: all test help bench install clean ptch
-
-# re-measure PTCH -> note tables (writes data/ptch, src/skptch.h)
-ptch:
-	mkdir -p out/ptch out/ptchv
-	cc -std=gnu99 -O2 -Isrc -Imdkit/include -Iout $(addprefix -I,$(wildcard mdkit/src/*/*)) tools/ptch_dump.c src/skcore.c src/skres.c $(VOICE_SRC) -lm -o out/ptch_dump
-	./out/ptch_dump && python3 tools/ptch_analyze.py && python3 tools/ptch_tables.py && python3 tools/gen_ptch_h.py
+.PHONY: all test help bench install clean

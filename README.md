@@ -140,7 +140,3 @@ Retrigger), Controls, Presets und `done`. Dazu erzeugt `tests/pd/gen_events.py` 
 `mdkit/` ist eine unveränderte Kopie von soejrd/mdkit (Commit in `mdkit/COMMIT`, CC0).
 `src/` ist der Pd-Wrapper dieses Projekts. Der Resampler `src/skres.c` stammt aus den früheren
 digidrum-Externals.
-
-## Note und Tonhöhe: `note`
-
-`note <midinote> [velocity]` setzt bei 14 Stimmen `PTCH` aus einer gemessenen Tabelle (`data/ptch/`, Übersicht in `SUMMARY.md`) und triggert. Alle anderen Stimmen triggern nur. `transpose <halbtöne>` verschiebt die Tonhöhe. Neu messen: `make ptch`.

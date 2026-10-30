@@ -127,22 +127,6 @@ int main(void)
         skcore_free(&c);
         free(a);
     }
-    {   /* note -> PTCH */
-        const char *name = "note"; skcore c; unsigned k; int lo = 0, hi = 0, none = 0;
-        for (k = 0; k < NVOICES; ++k) {
-            skcore_init(&c, all_voices[k], 44100.0);
-            if (!strcmp(all_voices[k]->name, "TRX-BD")) {
-                unsigned char a, b;
-                lo = skcore_note(&c, 30, 100); a = c.ctl[0];
-                hi = skcore_note(&c, 44, 100); b = c.ctl[0];
-                CHECK(lo == 1 && hi == 1 && b > a, "TRX-BD note table: %d -> %d", a, b);
-                c.transpose = 12; skcore_note(&c, 30, 100);
-                CHECK(c.ctl[0] > a, "transpose raises PTCH");
-            }
-            if (!strcmp(all_voices[k]->name, "TRX-CH")) { none = skcore_note(&c, 60, 100); CHECK(none == 0, "TRX-CH has no table"); }
-            skcore_free(&c);
-        }
-    }
     printf("%d voices, %d checks, %d failures\n", (int)NVOICES, checks, fails);
     if (fails) return 1;
     puts("ALL OK");

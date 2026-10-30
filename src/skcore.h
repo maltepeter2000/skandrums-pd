@@ -25,7 +25,6 @@ typedef struct skcore {
     int active, done_pending;
     unsigned quiet, quiet_need, idle, idle_max;
     int armed;
-    float transpose;              /* semitones, applied by note */
 } skcore;
 
 /* returns 0 on success, -1 on allocation failure */
@@ -35,10 +34,7 @@ void skcore_set_samplerate(skcore *c, double host_sr);
 void skcore_reset(skcore *c);                       /* re-init voice, defaults */
 void skcore_set_control(skcore *c, unsigned i, int value);   /* clamps 0..127 */
 int  skcore_find_control(const skcore *c, const char *name); /* case-insens., -1 */
-void skcore_trigger(skcore *c, int velocity);
-/* note-to-PTCH: sets PTCH from the measured table (ends clamped) and triggers.
- * Returns 1 when the voice has a table, else 0 (then only triggers). */
-int  skcore_note(skcore *c, double note, int velocity);       /* velocity 1..127, 0 -> 127 */
+void skcore_trigger(skcore *c, int velocity);       /* velocity 1..127, 0 -> 127 */
 void skcore_choke(skcore *c);
 void skcore_defaults(skcore *c);
 unsigned char skcore_default_of(const mdkit_voice *v, unsigned i);
