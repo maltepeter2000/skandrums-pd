@@ -54,6 +54,10 @@ License: CC0 1.0, same as mdkit.
 Controls are integers 0-127. The names are the control names from mdkit; mdkit does not describe
 what they do.
 
+The help patch of each object (here `trxb2~-help.pd`) shows the messages and a working test setup:
+
+![trxb2~ help patch](docs/trxb2-help.jpg)
+
 ## Connections
 
 | Connection | Type | Purpose |
@@ -111,6 +115,10 @@ When the slot changes, the current values are first written to the old slot, the
 loaded. An empty slot takes over the current sound. Outlet 1 of `[skpreset]` sends the loaded values
 as a list (for number boxes). For several voices use one text and one `[skpreset]` per voice, with
 all slot inlets driven from one `[hradio]`.
+
+The help patch `skpreset-help.pd` shows a complete setup with a step sequencer:
+
+![skpreset help patch](docs/skpreset-help.jpg)
 
 `done` arrives at outlet 1 when the voice stays below about -80 dB for longer than 50 ms.
 
