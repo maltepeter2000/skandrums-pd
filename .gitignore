@@ -2,3 +2,5 @@ out/
 *.pd_linux
 *.pd_darwin
 *.o
+__pycache__/
+*.pyc

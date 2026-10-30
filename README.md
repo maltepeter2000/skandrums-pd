@@ -1,16 +1,24 @@
 # skandrums-pd
 
-Pure-Data-Objekte für die 30 Drum-Stimmen aus [mdkit](https://github.com/soejrd/mdkit):
-je Stimme ein eigenes Objekt, zum Beispiel `[trxb2~]`, `[trxch~]`, `[efmbd~]`, `[pisd~]`.
-Alle Objekte entstehen aus demselben Quelltext (`src/skdrums_tilde.c`), nur die Stimme wechselt.
-Lizenz: CC0 1.0, wie mdkit.
+Pure Data externals for the 30 drum voices of [mdkit](https://github.com/soejrd/mdkit):
+one object per voice, for example `[trxb2~]`, `[trxch~]`, `[efmbd~]`, `[pisd~]`.
+All objects are built from the same source file (`src/skdrums_tilde.c`); only the voice changes.
+License: CC0 1.0, same as mdkit.
 
-**Stand:** Auf Linux gebaut und getestet (siehe unten). macOS und Bela sind noch nicht getestet.
-.
+**Status**
 
-## Objekte
+| Platform | State |
+| --- | --- |
+| Linux (desktop) | builds, `make test` passes (30 voices, 924 checks) |
+| macOS | builds as a universal binary (arm64 + x86_64) |
+| Bela Pepper | built on the board, loads in Pd 0.55-2, plays (image v0.3.8h, block size 32) |
 
-| Objekt | Controls (Default) |
+A drum rack for the Bela Pepper (4 slots, MIDI, buttons, LEDs, pots) lives in a separate repository:
+[beladrumrack](https://github.com/maltepeter2000/beladrumrack).
+
+## Objects
+
+| Object | Controls (default) |
 | --- | --- |
 | `trxb2~` | PTCH 60, DEC 65, RAMP 41, HOLD 62, TICK 91, NOIS 44, DIRT 56, DIST 58 |
 | `trxbd~` | PTCH 64, DEC 64, RAMP 0, RDEC 0, STRT 0, NOIS 0, HARM 0, CLIP 0 |
@@ -43,100 +51,136 @@ Lizenz: CC0 1.0, wie mdkit.
 | `pirs~` | PTCH 90, DEC 48, HARD 64, RING 64, RVOL 64, RDEC 64 |
 | `pisd~` | PTCH 64, DEC 64, HARD 10, RING 40, TENS 90, RVOL 80, RDEC 80 |
 
-Controls sind ganze Zahlen 0–127. Die Namen sind die Control-Namen aus mdkit; welche Wirkung sie
-haben, steht in mdkit nicht beschrieben.
+Controls are integers 0-127. The names are the control names from mdkit; mdkit does not describe
+what they do.
 
-## Anschlüsse
+## Connections
 
-| Anschluss | Typ | Aufgabe |
+| Connection | Type | Purpose |
 | --- | --- | --- |
-| Inlet | Messages | alle Befehle unten |
-| Outlet 0 | Signal | Mono-Audio |
-| Outlet 1 | Messages | Ereignisse: `choke`, `done`, `value`, `dump` |
+| Inlet | messages | all commands below |
+| Outlet 0 | signal | mono audio |
+| Outlet 1 | messages | events: `choke`, `done`, `value`, `dump` |
 
-## Messages am Inlet
+## Messages at the inlet
 
-| Message | Wirkung |
+| Message | Effect |
 | --- | --- |
-| `bang` | Trigger mit voller Stärke |
-| `<zahl>` | Trigger mit Anschlagstärke 1–127 (0 wird ignoriert) |
-| `<control> <0..127>` | Control per Namen setzen, z. B. `ptch 64`, `dirt 90` |
-| `ctl <index> <wert>` | Control per Nummer (0-basiert, Reihenfolge der Tabelle) |
-| `params a b c ...` | mehrere Controls ab Index 0 setzen |
-| `defaults` | alle Controls auf die Defaults der Stimme |
-| `level <0..8>` | Ausgangspegel als Faktor (Default 1.0) |
-| `reset` | Stimme neu starten, Controls auf Default |
-| `get <control>` | sendet `value <control> <wert>` an Outlet 1 |
-| `print` | Stimme, Controls und Samplerate in die Pd-Konsole |
-| `choke` | Stimme in `chokems` ausblenden (siehe Choke) |
-| `chokems <ms>` | Länge der Ausblendung, Default 3 ms |
-| `dump` | alle Controls als `dump <name> v0 v1 ...` an Outlet 1 |
-| `dump <name> v0 v1 ...` | Controls aus einem früheren Dump zurückladen |
+| `bang` | trigger at full velocity |
+| `<number>` | trigger with velocity 1-127 (0 is ignored) |
+| `<control> <0..127>` | set a control by name, e.g. `ptch 64`, `dirt 90` |
+| `ctl <index> <value>` | set a control by number (0-based, in the order of the table) |
+| `params a b c ...` | set several controls starting at index 0 |
+| `defaults` | set all controls to the voice defaults |
+| `level <0..8>` | output level as a factor (default 1.0) |
+| `reset` | restart the voice and set the controls to their defaults |
+| `get <control>` | sends `value <control> <value>` to outlet 1 |
+| `print` | voice, controls and sample rate to the Pd console |
+| `choke` | fade the voice out within `chokems` (see Choke) |
+| `chokems <ms>` | length of the fade, default 3 ms |
+| `dump` | sends all controls as `dump <name> v0 v1 ...` to outlet 1 |
+| `dump <name> v0 v1 ...` | restore the controls from an earlier dump |
 
-## Choke (z. B. Closed Hat schneidet Open Hat ab)
+## Choke (e.g. closed hat cuts off open hat)
 
-Outlet 1 sendet bei jedem Trigger die Message `choke`. Verbinde ihn mit dem Inlet der Stimme,
-die verstummen soll:
+Outlet 1 sends the message `choke` on every trigger. Connect it to the inlet of the voice that
+should be cut off:
 
-    [trxch~] Outlet 1  ->  Inlet [trxoh~]
+    [trxch~] outlet 1  ->  inlet [trxoh~]
 
-`trxoh~` blendet auf `choke` in `chokems` (3 ms) aus und bleibt still, bis es selbst getriggert wird.
-Jede Stimme kann jede andere choken, auch mehrere. Der Choke wirkt ab dem nächsten Audioblock.
+On `choke`, `trxoh~` fades out within `chokems` (3 ms) and stays silent until it is triggered itself.
+Every voice can choke any other voice, also several at once. The choke takes effect from the next
+audio block.
 
-## Presets und Steps: `[skpreset]`
+## Presets and steps: `[skpreset]`
 
-`dump` liefert den aktuellen Zustand als Message, `dump <name> v0 v1 ...` stellt ihn wieder her.
-Der Name nach `dump` ist der Objektname; eine Message mit fremdem Namen wird ignoriert.
+`dump` returns the current state as a message, `dump <name> v0 v1 ...` restores it.
+The name after `dump` is the object name; a message with a different name is ignored.
 
-Darauf baut die Abstraktion `pd/skpreset.pd` auf (Hilfe: `skpreset-help.pd`). Sie hält pro Stimme
-16 Slots (z. B. einen pro Step) in einem `[text define -k name]` im Hauptpatch, der mit dem Patch
-gespeichert wird:
+The abstraction `pd/skpreset.pd` builds on this (help: `skpreset-help.pd`). It keeps 16 slots per
+voice (for example one per step) in a `[text define -k name]` in the main patch, which is saved with
+the patch:
 
-    [trxb2~] Outlet 1  ->  [skpreset name] Inlet 0
-    [skpreset name] Outlet 0  ->  Inlet [trxb2~]
-    [hradio] (0..15)   ->  [skpreset name] Inlet 1
+    [trxb2~] outlet 1  ->  [skpreset name] inlet 0
+    [skpreset name] outlet 0  ->  inlet [trxb2~]
+    [hradio] (0..15)   ->  [skpreset name] inlet 1
 
-Beim Slotwechsel werden zuerst die aktuellen Werte in den alten Slot geschrieben, dann wird der neue
-geladen. Ein leerer Slot übernimmt den aktuellen Sound. Outlet 1 von `[skpreset]` liefert die geladenen
-Werte als Liste (für Zahlenboxen). Mehrere Stimmen: je ein Text und ein `[skpreset]`, alle Slot-Inlets
-von einem `[hradio]` aus.
+When the slot changes, the current values are first written to the old slot, then the new slot is
+loaded. An empty slot takes over the current sound. Outlet 1 of `[skpreset]` sends the loaded values
+as a list (for number boxes). For several voices use one text and one `[skpreset]` per voice, with
+all slot inlets driven from one `[hradio]`.
 
-`done` kommt an Outlet 1, wenn die Stimme länger als 50 ms unter etwa −80 dB bleibt.
+`done` arrives at outlet 1 when the voice stays below about -80 dB for longer than 50 ms.
 
-## Samplerate
+## Sample rate
 
-Die Stimmen laufen intern mit 44 100 Hz. Läuft Pd mit 44 100 Hz, geht das Signal unverändert durch
-(bit-gleich mit mdkit). Bei anderen Raten wird mit einem Kaiser-Sinc-Resampler (64 Taps) umgerechnet.
+The voices run internally at 44,100 Hz. If Pd runs at 44,100 Hz the signal passes unchanged
+(bit-identical with mdkit). At other rates it is converted with a Kaiser-sinc resampler (64 taps).
 
-## Bauen
+## Building
 
-Voraussetzung: C-Compiler, `make` und die Pd-Header (`m_pd.h`).
+Requirements: a C compiler, `make` and the Pd headers (`m_pd.h`).
+Only some voices: `make VOICES="trx/b2 trx/ch trx/oh"`.
 
-macOS (Pd vanilla in /Applications):
+### Desktop: macOS
 
-    make            # alle 30, universal arm64 + x86_64
-    make install    # nach ~/Documents/Pd/externals
+Pd vanilla in `/Applications` (the headers are taken from the app bundle):
 
-Pd danach neu starten.
+    make            # all 30, universal arm64 + x86_64 -> out/*.pd_darwin
+    make install    # copies to ~/Documents/Pd/externals
 
-Linux / Bela:
+Restart Pd afterwards. If the headers are not found, pass `PDINC=/path/to/dir/with/m_pd.h`.
 
-    make PDINC=/usr/include/pd          # bei Bela ggf. /usr/local/include/libpd
-    make install                        # nach ~/pd-externals
+### Desktop: Linux
 
-Nur einige Stimmen: `make VOICES="trx/b2 trx/ch trx/oh"`.
+    make PDINC=/usr/include/pd     # -> out/*.pd_linux
+    make install                   # copies to ~/pd-externals
+
+Add `~/pd-externals` to the Pd search path (Preferences > Path) and restart Pd.
+
+### Bela (tested on the Bela Pepper)
+
+The externals are built on the board itself, so no cross compiler is needed. Pd on the Bela image
+is Pd 0.55-2; the Pd headers are in `/usr/local/include/libpd/`.
+
+1. Copy the sources to the board (from the computer; `bela.local` is the board's address):
+
+        rsync -av --exclude '.git' --exclude 'out' ./ root@bela.local:/root/skandrums-pd/
+
+2. Build on the board (a few minutes; `tail` prints only when the build is finished):
+
+        ssh root@bela.local
+        cd /root/skandrums-pd
+        make -j2 PDINC=/usr/local/include/libpd/
+        ls out/*.pd_linux | wc -l          # should print 30
+
+3. Copy the externals **flat** into the Bela externals folder (no subfolder; a `[declare -path]`
+   to a subfolder is not picked up on the board):
+
+        cp out/*.pd_linux pd/skpreset.pd /root/Bela/projects/pd-externals/
+
+4. Use the objects in a Bela Pd project exactly like on the desktop (`[trxb2~]`, no `declare`
+   needed). Restart the project; the Pd console must not show `couldn't create`.
+
+Notes for the Bela: set the block size to 32 for low latency (`-p 32`); the voices render only while
+they are active, so idle voices cost almost nothing.
 
 ## Tests
 
-    make test       # alle 30 Stimmen, ohne Pd
+    make test       # all 30 voices, without Pd
+    make bench BS=32   # relative CPU cost per voice at a given block size
 
-Geprüft wird je Stimme: bit-gleiche Ausgabe bei 44,1 kHz, gleiche Ausgabe bei verschiedenen
-Blockgrößen (auch bei 48 kHz), lineare Anschlagstärke, Choke (Stille nach 3 ms, kein Knacken,
-Retrigger), Controls, Presets und `done`. Dazu erzeugt `tests/pd/gen_events.py` einen Pd-Lauf mit
-`trxch~` → `trxoh~`.
+Per voice the tests check: bit-identical output at 44.1 kHz, identical output for different block
+sizes (also at 48 kHz), linear velocity, choke (silence after 3 ms, no click, retrigger), controls,
+presets and `done`. In addition `tests/pd/gen_events.py` generates a Pd run with
+`trxch~` -> `trxoh~`.
 
-## Herkunft
+## Help patches
 
-`mdkit/` ist eine unveränderte Kopie von soejrd/mdkit (Commit in `mdkit/COMMIT`, CC0).
-`src/` ist der Pd-Wrapper dieses Projekts. Der Resampler `src/skres.c` stammt aus den früheren
-digidrum-Externals.
+`make help` regenerates `help/*.pd` and `pd/skpreset.pd` (needs `python3`).
+
+## Origin
+
+`mdkit/` is an unmodified copy of soejrd/mdkit (commit in `mdkit/COMMIT`, CC0).
+`src/` is the Pd wrapper of this project. The resampler `src/skres.c` comes from the earlier
+digidrum externals.
