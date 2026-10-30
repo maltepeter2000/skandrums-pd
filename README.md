@@ -20,7 +20,7 @@ A drum rack for the Bela Pepper (4 slots, MIDI, buttons, LEDs, pots) lives in a 
 
 | Object | Controls (default) |
 | --- | --- |
-| `trxb2~` | PTCH 60, DEC 65, RAMP 41, HOLD 62, TICK 91, NOIS 44, DIRT 56, DIST 58 |
+| `trxb2~` | PTCH 60, DEC 65, RAMP 41, HOLD 62, TICK 91, NOIS 44, DIRT 26, DIST 16 |
 | `trxbd~` | PTCH 64, DEC 64, RAMP 0, RDEC 0, STRT 0, NOIS 0, HARM 0, CLIP 0 |
 | `trxcb~` | PTCH 100, DEC 50, ENH 127, DAMP 127, TONE 0, BUMP 0 |
 | `trxch~` | GAP 0, DEC 8, HPF 0, LPF 127, MTAL 0 |
